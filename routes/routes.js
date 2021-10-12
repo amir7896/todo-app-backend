@@ -1,16 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const Employee = require('../models/employee');
-
+const Todo = require('../models/todo');
 const ObjectId = require('mongoose').Types.ObjectId;
+const mongojs = require('mongoose');
+
  
-// base path = http://localhost:3000/employees
+// base path = http://localhost:3000/Todos
 
 // =================
 // GET ALL TODOS
 // =================
 router.get('/' , (req,res) => {
-    Employee.find((err ,  doc) => {
+    Todo.find((err ,  doc) => {
         if(err){
             console.log(err);
         }else{
@@ -25,11 +26,11 @@ router.get('/' , (req,res) => {
 router.get('/:id' , async (req,res) => {
     const id = req.params.id;
     if(ObjectId.isValid(id)){
-        const emp = await Employee.findById(id);
+        const emp = await Todo.findById(id);
         res.send(emp)
     }
     else{
-        res.status(400).send('Employee Not Found By Given Id' + id);
+        res.status(400).send('Todo Not Found By Given Id' + id);
     }
 
 });
@@ -39,26 +40,26 @@ router.get('/:id' , async (req,res) => {
 // ADD DATAT IN DATABASE
 // ======================
 router.post('/' , (req,res) => {
-    const emp = new Employee ({
-        todos:  req.body.todos,
+    const emp = new Todo ({
+        title:  req.body.title,
         isDone:  req.body.isDone
     });
     emp.save( (err, doc) => {
         if(err){
             console.log(err);
         }else{
-            res.status(200).json({code:200, message:'Todo Added Successfully', addEmployee:doc});
+            res.status(200).json({code:200, message:'Todo Added Successfully', addTodo:doc});
         }
     });
 });
 
 // ======================================
-// GET Single  EMPLOYEE BY ID AND DELETE
+// GET Single  Todo BY ID AND DELETE
 // =====================================
 router.delete('/:id' , async (req,res) => {
     const id = req.params.id;
     if(ObjectId.isValid(id)){
-        const emp = await Employee.findByIdAndDelete(id);
+        const emp = await Todo.findByIdAndDelete(id);
         res.status(200).json({code:200, message:'Todo Deleted Successfully'});
     }
     else{
@@ -67,14 +68,13 @@ router.delete('/:id' , async (req,res) => {
 });
 
 // ======================
-// UPDATE EMPLOYEE BY ID
+// UPDATE Todo BY ID
 // ======================
 router.put('/:id' , async (req,res) => {
-   
     const id = req.params.id;
     if(ObjectId.isValid(id)){
-        const emp = (req.body);
-        const empUpdate = await Employee.findByIdAndUpdate(id ,{$set:emp}, {new:true});
+        const todo = (req.body);
+        const todoUpdate = await Todo.findByIdAndUpdate(id ,{$set:todo}, {new:true});
         res.status(200).json({code:200, message:'Todo Updated Successfully'});
     }
     else{
@@ -82,17 +82,40 @@ router.put('/:id' , async (req,res) => {
     }
 });
 
-// updateTodoisDoen
-router.put('/isDoen/:id' , (req,res) => {
-       
-    const id = req.params.id;
-    if(ObjectId.isValid(id)){
-        const emp = (req.body);
-        const empUpdate = await Employee.findByIdAndUpdate(id ,{$set:emp}, {new:true});
-        res.status(200).json({code:200, message:'Todo Updated Successfully'});
-    }
-    else{
-        res.status(400).send('Todo Not Found By Given Id' + id);
-    }
-})
+
+
 module.exports = router;
+
+
+
+
+
+
+// Update Task
+// router.put('/:id', function(req, res, next){
+//     var task = req.body;
+//     const id = req.params.id;
+//     var updTask = {};
+    
+//     if(task.isDone){
+//         updTask.isDone = task.isDone;
+//     }
+    
+//     if(task.title){
+//         updTask.title = task.title;
+//     }
+    
+//     if(!updTask){
+//         res.status(400);
+//         res.json({
+//             "error":"Bad Data"
+//         });
+//     } else {
+//         Todo.findByIdAndUpdate({_id:(id)},updTask, {}, function(err, task){
+//         if(err){
+//             res.send(err);
+//         }
+//         res.json(task);
+//     });
+//     }
+// });
